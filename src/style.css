@@ -94,6 +94,8 @@
 .simple-select-indicator-clearable,
 .simple-select-indicator-dropdown {
   display: flex;
+  align-items: center;
+  justify-content: center;
   color: var(--simpleSelect-indicator-color, rgb(204, 204, 204));
   cursor: pointer;
   padding: 8px;
@@ -115,7 +117,10 @@
 }
 
 .simple-select-indicator_active {
-  color: var(--simpleSelect-indicator-color-active, rgb(102, 102, 102));
+  color: var(
+    --simpleSelect-indicator-color-active,
+    rgb(102, 102, 102)
+  ) !important;
 }
 
 .simple-select-dropdown-container {

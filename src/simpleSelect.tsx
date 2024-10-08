@@ -15,6 +15,8 @@ type SimpleSelectProps<T extends OptionType = OptionType> = {
   showSeparator?: boolean;
   className?: string;
   placeholder?: string;
+  name?: string;
+  inputId?: string;
   options: T[];
   onChange?: (selected: any) => void;
   openMenuOnFocus?: boolean;
@@ -35,6 +37,8 @@ const SimpleSelect = <T extends OptionType>({
   onChange,
   className,
   placeholder,
+  name,
+  inputId,
   openMenuOnFocus = false,
   isClearable = false,
   isDisabled = false,
@@ -228,6 +232,10 @@ const SimpleSelect = <T extends OptionType>({
                 setIsOpen(true);
               }
             }}
+            {...{
+              name: name || undefined,
+              id: inputId || undefined,
+            }}
             {...(selectedIndex === null && {
               placeholder: placeholder ? placeholder : "Select...",
             })}
@@ -267,7 +275,11 @@ const SimpleSelect = <T extends OptionType>({
           )}
         </div>
       )}
-      <div className="simple-select-indicator-dropdown">
+      <div
+        className={`simple-select-indicator-dropdown${
+          isOpen ? " simple-select-indicator_active" : ""
+        }`}
+      >
         {components?.IndicatorDropdown ? (
           components.IndicatorDropdown
         ) : (
@@ -277,9 +289,7 @@ const SimpleSelect = <T extends OptionType>({
             viewBox="0 0 20 20"
             aria-hidden="true"
             focusable="false"
-            className={`simple-select-indicator-size${
-              isOpen ? " simple-select-indicator_active" : ""
-            }`}
+            className="simple-select-indicator-size"
           >
             <path
               fill="currentColor"

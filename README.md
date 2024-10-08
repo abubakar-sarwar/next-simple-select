@@ -1,18 +1,18 @@
-# React-Select
+# Simple-Next-Select
 
 [![NPM](https://img.shields.io/npm/v/react-select.svg)](https://www.npmjs.com/package/react-select)
 
 Simple-Next-Select helps you develop powerful select components that _just work_ out of the box, without stopping you from customising the parts that are important to you.
 
-For the story behind this component, watch Jed's talk at React Conf 2019 - [building React Select](https://youtu.be/yS0jUnmBujE)
+## Features
 
-Features include:
-
-- Flexible approach to data, with customisable functions
-- Extensible styling API with [emotion](https://emotion.sh)
-- Component Injection API for complete control over the UI behaviour
-- Controllable state props and modular architecture
-- Long-requested features like option groups, portal support, animation, and more
+- **Flexible Data Handling**: Customizable functions allow for a flexible approach to managing options.
+- **Customizable Styles**: Control styles using CSS classes and CSS variables for a tailored look.
+- **Component Injection**: Inject custom components for full control over the UI behavior.
+- **Controllable State Management**: Easily manage state through props for a modular architecture.
+- **Virtual List Support**: Efficiently handle large datasets with optional virtual scrolling for improved performance.
+- **Accessibility Focused**: Built-in accessibility features to enhance usability for all users.
+- **Clearable Selection**: Users can easily clear their selection when needed.
 
 # Installation and usage
 
@@ -20,6 +20,11 @@ The easiest way to use simple-next-select is to install it from npm or yarn and 
 
 ```bash
 npm i simple-next-select
+```
+
+or
+
+```bash
 yarn add simple-next-select
 ```
 
@@ -72,6 +77,62 @@ Common props you may want to specify include:
   - `Option` - render a custom option component.
 
 ## Customization
+
+You can customize the behavior and appearance of the select component through **component injection**. This feature allows you to replace or enhance specific parts of the select component. Below are the available components you can inject:
+
+### Available Components
+
+**Option**: Replace the default option rendering with your custom component to enhance the option display also changes the selected value component.
+
+- **IndicatorDropdown**: Customize the dropdown indicator component.
+- **IndicatorSeparator**: Modify the separator between the select control and the dropdown indicator.
+- **IndicatorClearable**: Customize the clearable indicator that appears when the select has a value.
+
+## Usage
+
+To use component injection, you can pass the desired components as props to the select component. Here’s an example:
+
+```js
+import Image from "next/image";
+import SimpleSelect from "simple-select";
+
+const options = [
+  { value: "test1", label: "Test 1", flag: "https://flagcdn.com/w320/pk.png" },
+  { value: "test2", label: "Test 2", flag: "https://flagcdn.com/w320/ca.png" },
+  { value: "test3", label: "Test 3", flag: "https://flagcdn.com/w320/us.png" },
+];
+
+export default function App() {
+  return (
+    <div className="App">
+      <SimpleSelect
+        name="country"
+        inputId="country"
+        showSeparator
+        isClearable
+        useVirtualList
+        options={options}
+        components={{
+          Option: (option) => {
+            return (
+              <div className="flex items-center gap-3">
+                <Image
+                  src={option.flag}
+                  alt="flag"
+                  width={30}
+                  height={15}
+                  className="object-contain aspect-video"
+                />
+                {option.label}
+              </div>
+            );
+          },
+        }}
+      />
+    </div>
+  );
+}
+```
 
 You can customize the styles of the component using CSS classes as well as CSS variables. Below are the available CSS variables you can set in your styles:
 
