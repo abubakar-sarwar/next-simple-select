@@ -3,7 +3,7 @@ import { defineConfig } from "tsup";
 export default defineConfig({
   format: ["cjs", "esm"],
   entry: ["./src/index.ts"],
-  external: ["react", /\.css$/],
+  external: ["react", "react-window", /\.css$/],
   dts: true,
   shims: true,
   skipNodeModulesBundle: true,
