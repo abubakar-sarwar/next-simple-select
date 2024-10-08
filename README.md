@@ -30,8 +30,9 @@ yarn add simple-next-select
 
 Then use it in your app:
 
-```tsx
-import React, { useState } from "react";
+```js
+"use client";
+import { useState } from "react";
 import SimpleSelect from "simple-next-select";
 
 const options = [
@@ -46,7 +47,7 @@ export default function App() {
   return (
     <div className="App">
       <SimpleSelect
-        defaultValue={selectedOption}
+        value={selectedOption}
         onChange={setSelectedOption}
         options={options}
       />
@@ -62,6 +63,7 @@ Common props you may want to specify include:
 - `className` - apply a className to the control.
 - `isDisabled` - disable the control.
 - `name` - generate an HTML input with this name, containing the current value.
+- `inputId` - generate an HTML input with this id, containing the current value.
 - `onChange` - subscribe to change events.
 - `options` - specify the options the user can select from.
 - `placeholder` - change the text displayed when no option is selected.
@@ -76,25 +78,26 @@ Common props you may want to specify include:
   - `IndicatorClearable` - custom clear indicator.
   - `Option` - render a custom option component.
 
-## Customization
+## Customizations
 
 You can customize the behavior and appearance of the select component through **component injection**. This feature allows you to replace or enhance specific parts of the select component. Below are the available components you can inject:
 
 ### Available Components
 
-**Option**: Replace the default option rendering with your custom component to enhance the option display also changes the selected value component.
-
+- **Option**: Replace the default option rendering with your custom component to enhance the option display also changes the selected value component.
 - **IndicatorDropdown**: Customize the dropdown indicator component.
 - **IndicatorSeparator**: Modify the separator between the select control and the dropdown indicator.
 - **IndicatorClearable**: Customize the clearable indicator that appears when the select has a value.
 
-## Usage
+### Usage
 
 To use component injection, you can pass the desired components as props to the select component. Here’s an example:
 
 ```js
+"use client";
 import Image from "next/image";
-import SimpleSelect from "simple-select";
+import { FiMinus, FiMoreVertical, FiPlus } from "react-icons/fi";
+import SimpleSelect from "./simpleSelect";
 
 const options = [
   { value: "test1", label: "Test 1", flag: "https://flagcdn.com/w320/pk.png" },
@@ -113,6 +116,13 @@ export default function App() {
         useVirtualList
         options={options}
         components={{
+          IndicatorClearable: <FiMinus />,
+          IndicatorDropdown: <FiPlus />,
+          IndicatorSeparator: (
+            <div className="flex items-center">
+              <FiMoreVertical />
+            </div>
+          ),
           Option: (option) => {
             return (
               <div className="flex items-center gap-3">
@@ -165,7 +175,7 @@ The build process uses `tsup` to generate both CommonJS and ES modules, while al
 ```json
 "dependencies": {
   "react": "^18.3.1",
-    "react-window": "^1.8.10"
+  "react-window": "^1.8.10"
 }
 ```
 
