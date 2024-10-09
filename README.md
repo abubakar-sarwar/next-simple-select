@@ -1,8 +1,9 @@
-# Simple-Next-Select
+# Next-Simple-Select
 
 [![NPM](https://img.shields.io/npm/v/react-select.svg)](https://www.npmjs.com/package/react-select)
+[![License](https://github.com/abubakar-sarwar/next-simple-select/blob/main/LICENCE)]
 
-Simple-Next-Select helps you develop powerful select components that _just work_ out of the box, without stopping you from customising the parts that are important to you.
+Next-Simple-Select helps you develop powerful select components that _just work_ out of the box, without stopping you from customising the parts that are important to you.
 
 ## Features
 
@@ -14,18 +15,30 @@ Simple-Next-Select helps you develop powerful select components that _just work_
 - **Accessibility Focused**: Built-in accessibility features to enhance usability for all users.
 - **Clearable Selection**: Users can easily clear their selection when needed.
 
+## Long List Optimization
+
+### Purpose of the Package
+
+This package is designed to enhance the performance of applications dealing with large datasets, particularly when rendering long lists. As web applications grow in complexity and the amount of data they handle increases, performance optimization becomes critical. This package aims to provide developers with tools to efficiently manage and render large lists without compromising user experience.
+
+### Long List Optimization
+
+One of the standout features of this package is the implementation of `useVirtualList`, which optimizes the rendering of extensive datasets. By using virtualization, the package only renders the items currently visible in the viewport, significantly improving performance and reducing memory usage.
+
+#### Benefits of Using `useVirtualList`:
+
+- **Improved Performance**: Renders only the items visible in the user’s viewport, which leads to faster load times and smoother interactions.
+- **Reduced Memory Footprint**: Minimizes the number of DOM nodes created, conserving memory resources for large datasets.
+- **Seamless User Experience**: Provides a responsive interface even with substantial amounts of data, making scrolling and interaction fluid.
+
+> **Note**: This feature is disabled by default. To enable virtual scrolling, set the `useVirtualList` prop to `true` in your component.
+
 # Installation and usage
 
 The easiest way to use simple-next-select is to install it from npm or yarn and build it into your app with Webpack.
 
 ```bash
 npm i simple-next-select
-```
-
-or
-
-```bash
-yarn add simple-next-select
 ```
 
 Then use it in your app:

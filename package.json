@@ -1,7 +1,7 @@
 {
-  "name": "simple-select",
+  "name": "next-simple-select",
   "version": "0.0.1",
-  "description": "simple-select optimized for large lists",
+  "description": "next-simple-select optimized for large lists",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "style": "./dist/index.css",
@@ -12,15 +12,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/abubakar-sarwar/simple-select.git"
+    "url": "git+https://github.com/abubakar-sarwar/next-simple-select.git"
   },
   "keywords": [
-    "simple-select"
+    "next-simple-select"
   ],
   "author": "M.Abu Bakar",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
-    "url": "https://github.com/abubakar-sarwar/simple-select/issues"
+    "url": "https://github.com/abubakar-sarwar/next-simple-select/issues"
   },
   "devDependencies": {
     "@types/node": "^22.7.5",
