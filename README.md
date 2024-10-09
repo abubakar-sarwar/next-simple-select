@@ -1,7 +1,7 @@
 # Next-Simple-Select
 
 [![NPM](https://img.shields.io/npm/v/react-select.svg)](https://www.npmjs.com/package/react-select)
-[![License](https://github.com/abubakar-sarwar/next-simple-select/blob/main/LICENCE)]
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/abubakar-sarwar/next-simple-select/blob/main/LICENCE)
 
 Next-Simple-Select helps you develop powerful select components that _just work_ out of the box, without stopping you from customising the parts that are important to you.
 
@@ -156,6 +156,8 @@ export default function App() {
   );
 }
 ```
+
+![Sample Component Injection Image](https://github.com/abubakar-sarwar/next-simple-select/blob/main/simpleSelectCustom.png)
 
 You can customize the styles of the component using CSS classes as well as CSS variables. Below are the available CSS variables you can set in your styles:
 

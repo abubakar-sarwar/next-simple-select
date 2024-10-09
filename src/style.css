@@ -1,5 +1,6 @@
 :root {
   --simpleSelect-border-radius: 4px;
+  --simpleSelect-background: rgba(255, 255, 255, 1);
   --simpleSelect-border: rgba(204, 204, 204, 1);
   --simpleSelect-border-focus: rgba(38, 132, 255, 1);
   --simpleSelect-input-color: rgba(0, 0, 0, 1);
@@ -21,6 +22,7 @@
   display: flex;
   border: 1px solid var(--simpleSelect-border, rgb(204, 204, 204));
   border-radius: var(--simpleSelect-border-radius, 4px);
+  background-color: var(--simpleSelect-background, rgb(255, 255, 255));
   box-sizing: border-box;
 }
 

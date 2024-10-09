@@ -7,7 +7,7 @@ export default defineConfig({
   dts: true,
   shims: true,
   skipNodeModulesBundle: true,
-  // minify: true,
+  minify: true,
   outDir: "dist",
   clean: true,
   injectStyle: true,
