@@ -163,8 +163,9 @@ You can customize the styles of the component using CSS classes as well as CSS v
 
 ```css
 :root {
-  --simpleSelect-border-radius: 4px;
+  --simpleSelect-background: rgba(255, 255, 255, 1);
   --simpleSelect-border: rgba(204, 204, 204, 1);
+  --simpleSelect-border-radius: 4px;
   --simpleSelect-border-focus: rgba(38, 132, 255, 1);
   --simpleSelect-input-color: rgba(0, 0, 0, 1);
   --simpleSelect-placeholder-color: rgba(128, 128, 128, 1);
