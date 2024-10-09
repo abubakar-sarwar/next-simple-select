@@ -202,4 +202,4 @@ Looking forward to your feedback and contributions!
 
 ## License
 
-MIT Licensed.
+MIT Licensed. Copyright (c) M. Abu Bakar 2024.

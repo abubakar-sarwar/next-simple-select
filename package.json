@@ -15,7 +15,12 @@
     "url": "git+https://github.com/abubakar-sarwar/next-simple-select.git"
   },
   "keywords": [
-    "next-simple-select"
+    "next-simple-select",
+    "form",
+    "input",
+    "select",
+    "next",
+    "react"
   ],
   "author": "M.Abu Bakar",
   "license": "MIT",
