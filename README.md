@@ -35,10 +35,10 @@ One of the standout features of this package is the implementation of `useVirtua
 
 # Installation and usage
 
-The easiest way to use simple-next-select is to install it from npm or yarn and build it into your app with Webpack.
+The easiest way to use next-simple-select is to install it from npm or yarn and build it into your app with Webpack.
 
 ```bash
-npm i simple-next-select
+npm i next-simple-select
 ```
 
 Then use it in your app:
@@ -46,7 +46,7 @@ Then use it in your app:
 ```js
 "use client";
 import { useState } from "react";
-import SimpleSelect from "simple-next-select";
+import SimpleSelect from "next-simple-select";
 
 const options = [
   { value: "test1", label: "Test 1" },
@@ -110,7 +110,7 @@ To use component injection, you can pass the desired components as props to the 
 "use client";
 import Image from "next/image";
 import { FiMinus, FiMoreVertical, FiPlus } from "react-icons/fi";
-import SimpleSelect from "./simpleSelect";
+import SimpleSelect from "next-simple-select";
 
 const options = [
   { value: "test1", label: "Test 1", flag: "https://flagcdn.com/w320/pk.png" },
