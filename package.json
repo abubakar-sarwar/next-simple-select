@@ -1,7 +1,7 @@
 {
   "name": "next-simple-select",
   "version": "0.0.1",
-  "description": "next-simple-select optimized for large lists",
+  "description": "next-simple-select optimized for large datasets",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "style": "./dist/index.css",
