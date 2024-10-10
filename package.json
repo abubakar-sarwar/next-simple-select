@@ -1,6 +1,6 @@
 {
   "name": "next-simple-select",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "next-simple-select optimized for large datasets",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",

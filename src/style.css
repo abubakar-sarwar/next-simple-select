@@ -1,41 +1,35 @@
 :root {
   --simpleSelect-border-radius: 4px;
-
   --simpleSelect-background: rgba(255, 255, 255, 1);
   --simpleSelect-border: rgba(204, 204, 204, 1);
   --simpleSelect-border-focus: rgba(38, 132, 255, 1);
-
   --simpleSelect-input-color: rgba(0, 0, 0, 1);
   --simpleSelect-placeholder-color: rgba(128, 128, 128, 1);
   --simpleSelect-separator-color: rgba(204, 204, 204, 1);
   --simpleSelect-indicator-color: rgba(204, 204, 204, 1);
-
   --simpleSelect-indicator-color-active: rgba(102, 102, 102, 1);
-
   --simpleSelect-dropdown-bg: rgba(255, 255, 255, 1);
-
   --simpleSelect-option-focus-bg: rgb(222, 235, 255, 1);
   --simpleSelect-option-focus: rgba(0, 0, 0, 1);
-
   --simpleSelect-option-active-bg: rgba(49, 129, 250, 1);
   --simpleSelect-option-active: rgba(255, 255, 255, 1);
-
   --simpleSelect-no-option: rgba(153, 153, 153, 1);
-
   --simpleSelect-size-indicators: 20px;
 }
 
 .simple-select {
   position: relative;
   display: flex;
-  border: 1px solid var(--simpleSelect-border, rgba(204, 204, 204, 1));
+  border: 1px solid var(--simpleSelect-border, rgb(204, 204, 204));
   border-radius: var(--simpleSelect-border-radius, 4px);
-  background-color: var(--simpleSelect-background, rgba(255, 255, 255, 1));
+  background-color: var(--simpleSelect-background, rgb(255, 255, 255));
   box-sizing: border-box;
 }
 
 .simple-select_isDisabled *,
 .simple-select_isDisabled {
+  -webkit-user-select: none;
+  -moz-user-select: none;
   user-select: none;
   cursor: not-allowed !important;
   opacity: 0.5;
@@ -52,7 +46,7 @@
 }
 
 .simple-select:focus-within {
-  border: 1px solid var(--simpleSelect-border-focus, rgba(38, 132, 255, 1));
+  border: 1px solid var(--simpleSelect-border-focus, rgb(38, 132, 255));
 }
 
 .simple-select-control {
@@ -66,7 +60,7 @@
 
 .simple-select-value,
 .simple-select-input-control {
-  grid-area: 1 / 1 / 2 / 3;
+  grid-area: 1/1/2/3;
   margin: 3px 0;
   padding: 1px 3px;
 }
@@ -75,6 +69,7 @@
   outline: 0;
   width: 100%;
 }
+
 .simple-select-input {
   font-family: inherit;
   font-feature-settings: inherit;
@@ -88,7 +83,7 @@
   background: 0px center;
   opacity: 1;
   width: 100%;
-  grid-area: 1 / 2;
+  grid-area: 1/2;
   min-width: 2px;
   border: 0px;
   margin: 0px;
@@ -96,8 +91,12 @@
   padding: 0px;
 }
 
+.simple-select-placeholder::-moz-placeholder {
+  color: var(--simpleSelect-placeholder-color, rgb(128, 128, 128));
+}
+
 .simple-select-placeholder::placeholder {
-  color: var(--simpleSelect-placeholder-color, rgba(128, 128, 128, 1));
+  color: var(--simpleSelect-placeholder-color, rgb(128, 128, 128));
 }
 
 .simple-select-indicator-clearable,
@@ -105,10 +104,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--simpleSelect-indicator-color, rgba(204, 204, 204, 1));
+  color: var(--simpleSelect-indicator-color, rgb(204, 204, 204));
   cursor: pointer;
   padding: 8px;
-  -webkit-transition: color 150ms;
   transition: color 150ms;
 }
 
@@ -117,8 +115,7 @@
 }
 
 .simple-select-separator {
-  border-left: 1px solid
-    var(--simpleSelect-separator-color, rgba(204, 204, 204, 1));
+  border-left: 1px solid var(--simpleSelect-separator-color, rgb(204, 204, 204));
   margin: 8px 0;
 }
 
@@ -132,7 +129,7 @@
 .simple-select-indicator-clearable:hover {
   color: var(
     --simpleSelect-indicator-color-active,
-    rgba(102, 102, 102, 1)
+    rgb(102, 102, 102)
   ) !important;
 }
 
@@ -151,8 +148,8 @@
   position: relative;
   box-sizing: border-box;
   -webkit-overflow-scrolling: touch;
-  background-color: var(--simpleSelect-dropdown-bg, rgba(255, 255, 255, 1));
-  border: 1px solid var(--simpleSelect-border, rgba(204, 204, 204, 1));
+  background-color: var(--simpleSelect-dropdown-bg, rgb(255, 255, 255));
+  border: 1px solid var(--simpleSelect-border, rgb(204, 204, 204));
   border-radius: var(--simpleSelect-border-radius, 4px);
 }
 
@@ -163,7 +160,6 @@
   width: 100%;
   -webkit-user-select: none;
   -moz-user-select: none;
-  -ms-user-select: none;
   user-select: none;
   color: inherit;
   padding: 8px 12px;
@@ -172,15 +168,17 @@
 .simple-select-option:not(.simple-select-option__isActive):hover,
 .simple-select-option__isfocused:not(.simple-select-option__isActive) {
   color: var(--simpleSelect-option-focus, inherit);
-  background-color: var(--simpleSelect-option-focus-bg, rgba(222, 235, 255, 1));
+  background-color: var(--simpleSelect-option-focus-bg, rgb(222, 235, 255));
 }
+
 .simple-select-option__isActive {
-  color: var(--simpleSelect-option-active, rgba(255, 255, 255, 1));
-  background-color: var(--simpleSelect-option-active-bg, rgba(49, 129, 250, 1));
+  color: var(--simpleSelect-option-active, rgb(255, 255, 255));
+  background-color: var(--simpleSelect-option-active-bg, rgb(49, 129, 250));
 }
 
 .simple-select-no-option {
+  margin: 5px 0;
   text-align: center;
-  color: var(--simpleSelect-no-option, rgba(153, 153, 153, 1));
+  color: var(--simpleSelect-no-option, rgb(153, 153, 153));
   padding: 8px 12px;
-}
+} /*# sourceMappingURL=style.css.map */
