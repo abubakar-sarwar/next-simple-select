@@ -118,7 +118,9 @@
   height: var(--simpleSelect-size-indicators, 20px);
 }
 
-.simple-select-indicator_active {
+.simple-select-indicator_active,
+.simple-select-indicator-dropdown:hover,
+.simple-select-indicator-clearable:hover {
   color: var(
     --simpleSelect-indicator-color-active,
     rgb(102, 102, 102)

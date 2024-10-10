@@ -53,6 +53,16 @@ const SimpleSelect = <T extends OptionType>({
   );
   const [highlightedIndex, setHighlightedIndex] = useState<number | null>(null);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
+  const clearableRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (value) {
+      const selOption = options.findIndex(
+        (item) => item.label === value?.label
+      );
+      setSelectedIndex(selOption !== -1 ? selOption : null);
+    }
+  }, [value]);
 
   useEffect(() => {
     if (options.length > 500 && !useVirtualList) {
@@ -69,7 +79,14 @@ const SimpleSelect = <T extends OptionType>({
   }, [isDisabled]);
 
   // Toggle the dropdown visibility
-  const toggleDropdown = () => {
+  const toggleDropdown = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (
+      clearableRef.current &&
+      clearableRef.current.contains(e.target as Node)
+    ) {
+      return;
+    }
+
     if (!isDisabled) {
       setIsOpen(!isOpen);
     }
@@ -82,17 +99,8 @@ const SimpleSelect = <T extends OptionType>({
         dropdownRef.current &&
         !dropdownRef.current.contains(e.target as Node)
       ) {
-        setSelectedIndex(null);
         setIsOpen(false);
         setInputValue("");
-        if (onChange) {
-          const obj: any = {} as T;
-
-          for (const key in obj) {
-            obj[key as any] = undefined;
-          }
-          onChange(obj);
-        }
       }
     };
 
@@ -149,16 +157,16 @@ const SimpleSelect = <T extends OptionType>({
   // Select the highlighted option
   const handleOptionSelect = useCallback(
     (option: T) => {
-      setSelectedIndex(options.indexOf(option));
+      setSelectedIndex(value ? findVal : options.indexOf(option));
       setIsOpen(false);
       setInputValue("");
       if (onChange) onChange(option);
     },
-    [options, onChange]
+    [options, onChange, value]
   );
 
   const handleClear = useCallback(() => {
-    setSelectedIndex(null);
+    setSelectedIndex(value ? findVal : null);
     setIsOpen(false);
     setInputValue("");
     if (onChange) {
@@ -169,11 +177,11 @@ const SimpleSelect = <T extends OptionType>({
       }
       onChange(obj);
     }
-  }, []);
+  }, [value]);
 
   const renderOption = useCallback(
     (item: T) => {
-      return components?.Option ? components.Option(item) : item.label;
+      return components?.Option ? components.Option(item) : item?.label;
     },
     [components]
   );
@@ -245,6 +253,7 @@ const SimpleSelect = <T extends OptionType>({
       {isClearable && selectedIndex !== null && (
         <div
           onClick={handleClear}
+          ref={clearableRef}
           className={`simple-select-indicator-clearable${
             isOpen ? " simple-select-indicator_active" : ""
           }`}
