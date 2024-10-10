@@ -1,6 +1,9 @@
 /src
 /node_modules
 simpleSelectCustom.png
+LICENCE
+package-lock.json
+.gitignore
 
 .env*.local
 .DS_Store

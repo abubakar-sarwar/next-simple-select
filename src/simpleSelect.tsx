@@ -10,7 +10,7 @@ type OptionType = {
 };
 
 type SimpleSelectProps<T extends OptionType = OptionType> = {
-  value?: T;
+  value?: T | undefined | null;
   isClearable?: boolean;
   showSeparator?: boolean;
   className?: string;
