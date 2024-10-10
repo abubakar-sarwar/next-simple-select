@@ -1,7 +1,7 @@
 # Next-Simple-Select
 
 [![NPM](https://img.shields.io/npm/v/next-react-select.svg)](https://www.npmjs.com/package/next-simple-select)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/abubakar-sarwar/next-simple-select/blob/main/LICENCE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/abubakar-sarwar/next-simple-select/blob/main/LICENSE)
 
 Next-Simple-Select helps you develop powerful select components that _just work_ out of the box, without stopping you from customising the parts that are important to you.
 
