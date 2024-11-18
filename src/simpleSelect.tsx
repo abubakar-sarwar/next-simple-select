@@ -216,13 +216,13 @@ const SimpleSelect = <T extends OptionType>({
                 setState((prev) => ({ ...prev, isOpen: true }));
               }
             }}
-            onChange={(e) =>
+            onChange={(e) => {
               setState((prev) => ({
                 ...prev,
                 inputValue: e.target.value,
-                isOpen: !isOpen && !isDisabled,
-              }))
-            }
+                isOpen: !prev.isOpen && !isDisabled ? true : prev.isOpen,
+              }));
+            }} 
             {...{
               name: name || undefined,
               id: inputId || undefined,
