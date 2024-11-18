@@ -222,7 +222,7 @@ const SimpleSelect = <T extends OptionType>({
                 inputValue: e.target.value,
                 isOpen: !prev.isOpen && !isDisabled ? true : prev.isOpen,
               }));
-            }} 
+            }}
             {...{
               name: name || undefined,
               id: inputId || undefined,
@@ -268,6 +268,7 @@ const SimpleSelect = <T extends OptionType>({
         </div>
       )}
       <div
+        onClick={toggleDropdown}
         className={`simple-select-indicator-dropdown${
           isOpen ? " simple-select-indicator_active" : ""
         }`}
