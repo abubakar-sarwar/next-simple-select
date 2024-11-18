@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 
 const NormalList = <T,>({
   options,
@@ -8,57 +8,49 @@ const NormalList = <T,>({
   handleOptionSelect,
   renderOption,
 }: {
-  renderOption: (
-    item: T
-  ) =>
-    | string
-    | number
-    | boolean
-    | JSX.Element
-    | Iterable<React.ReactNode>
-    | null
-    | undefined;
+  renderOption: (item: T) => React.ReactNode;
   options: T[];
   selectedIndex: number | null;
   highlightedIndex: number | null;
-  setHighlightedIndex: Dispatch<SetStateAction<number | null>>;
-  handleOptionSelect: (option: any) => void;
+  setHighlightedIndex: (index: number | null) => void;
+  handleOptionSelect: (option: T, index: number) => void;
 }) => {
-  const dropdownComRef = useRef<HTMLUListElement | null>(null);
+  const dropdownRef = useRef<HTMLUListElement | null>(null);
+
   useEffect(() => {
-    if (dropdownComRef.current && highlightedIndex !== null) {
-      const highlightedOption =
-        dropdownComRef.current.children?.[highlightedIndex];
-      if (highlightedOption) {
-        highlightedOption.scrollIntoView({
-          block: "nearest",
-        });
+    if (dropdownRef.current && highlightedIndex !== null) {
+      const highlightedOption = dropdownRef.current.children[highlightedIndex];
+      if (highlightedOption instanceof HTMLElement) {
+        highlightedOption.scrollIntoView({ block: "nearest" });
       }
     }
   }, [highlightedIndex]);
 
   return (
-    <ul className="simple-select-dropdown" ref={dropdownComRef}>
-      {options?.length > 0 ? (
-        options.map((item, index) => (
-          <li
-            key={index}
-            className={`simple-select-option${
-              highlightedIndex === index
-                ? " simple-select-option__isfocused"
-                : ""
-            }${
-              selectedIndex === index ? " simple-select-option__isActive" : ""
-            }`}
-            onMouseEnter={() => setHighlightedIndex(index)}
-            onClick={() => handleOptionSelect(item)}
-          >
-            {renderOption(item)}
-          </li>
-        ))
+    <ul className="simple-select-dropdown" ref={dropdownRef}>
+      {options.length > 0 ? (
+        options.map((item, index) => {
+          const isFocused = highlightedIndex === index;
+          const isSelected = selectedIndex === index;
+
+          return (
+            <li
+              key={index}
+              className={`simple-select-option${
+                isFocused ? " simple-select-option__isfocused" : ""
+              }${isSelected ? " simple-select-option__isActive" : ""}`}
+              onMouseEnter={() => setHighlightedIndex(index)}
+              onClick={() => handleOptionSelect(item, index)}
+              role="option"
+              aria-selected={isSelected}
+            >
+              {renderOption(item)}
+            </li>
+          );
+        })
       ) : (
-        <li>
-          <p className="simple-select-no-option">No Options</p>
+        <li className="simple-select-no-option">
+          <p>No Options</p>
         </li>
       )}
     </ul>

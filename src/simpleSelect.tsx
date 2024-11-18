@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import "./style.css";
 import VirtualList from "./virtualList";
 import NormalList from "./normalList";
@@ -45,24 +45,22 @@ const SimpleSelect = <T extends OptionType>({
   showSeparator = false,
   useVirtualList = false,
 }: SimpleSelectProps<T>) => {
-  const [isOpen, setIsOpen] = useState<boolean>(false);
-  const [inputValue, setInputValue] = useState<string>("");
-  const findVal = options.findIndex((item) => item.label === value?.label);
-  const [selectedIndex, setSelectedIndex] = useState<number | null>(
-    findVal !== -1 ? findVal : null
-  );
-  const [highlightedIndex, setHighlightedIndex] = useState<number | null>(null);
+  const [state, setState] = useState<{
+    isOpen: boolean;
+    inputValue: string;
+    selectedIndex: null | number;
+    highlightedIndex: number | null;
+  }>({
+    isOpen: false,
+    inputValue: "",
+    selectedIndex:
+      options.findIndex((item) => item.label === value?.label) ?? null,
+    highlightedIndex: null,
+  });
+
+  const { isOpen, inputValue, selectedIndex, highlightedIndex } = state;
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const clearableRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    if (value) {
-      const selOption = options.findIndex(
-        (item) => item.label === value?.label
-      );
-      setSelectedIndex(selOption !== -1 ? selOption : null);
-    }
-  }, [value]);
 
   useEffect(() => {
     if (options.length > 500 && !useVirtualList) {
@@ -70,114 +68,104 @@ const SimpleSelect = <T extends OptionType>({
         "There are too many options in the list. Consider setting 'useVirtualList={true}' in <SelectSimple> for improved performance."
       );
     }
-  }, [options.length, useVirtualList]);
-
-  useEffect(() => {
-    if (isOpen) {
-      setIsOpen(false);
-    }
-  }, [isDisabled]);
+    if (highlightedIndex && highlightedIndex > options?.length)
+      [setState((prev) => ({ ...prev, highlightedIndex: null }))];
+  }, [options]);
 
   // Toggle the dropdown visibility
-  const toggleDropdown = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (
-      clearableRef.current &&
-      clearableRef.current.contains(e.target as Node)
-    ) {
-      return;
-    }
-
-    if (!isDisabled) {
-      setIsOpen(!isOpen);
-    }
-  };
+  const toggleDropdown = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      if (!clearableRef.current?.contains(e.target as Node) || !isDisabled) {
+        setState((prev) => ({ ...prev, isOpen: !prev.isOpen }));
+      }
+    },
+    [isDisabled]
+  );
 
   // Close dropdown if clicked outside
   useEffect(() => {
-    const handleOutsideClick = (e: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(e.target as Node)
-      ) {
-        setIsOpen(false);
-        setInputValue("");
-      }
-    };
-
     if (isOpen) {
-      document.addEventListener("mousedown", handleOutsideClick);
-    } else {
-      document.removeEventListener("mousedown", handleOutsideClick);
+      const closeDropdown = (e: MouseEvent) => {
+        if (!dropdownRef.current?.contains(e.target as Node)) {
+          setState((prev) => ({ ...prev, isOpen: false }));
+        }
+      };
+      document.addEventListener("mousedown", closeDropdown);
+      return () => document.removeEventListener("mousedown", closeDropdown);
     }
-
-    return () => document.removeEventListener("mousedown", handleOutsideClick);
   }, [isOpen]);
+
+  // Select the highlighted option
+  const handleOptionSelect = useCallback(
+    (option: T, index: number) => {
+      setState((prev) => ({
+        ...prev,
+        isOpen: false,
+        inputValue: "",
+        selectedIndex: index,
+      }));
+      onChange?.(option);
+    },
+    [onChange, options]
+  );
+
+  const handleClear = useCallback(() => {
+    setState({
+      isOpen: false,
+      inputValue: "",
+      selectedIndex: null,
+      highlightedIndex: null,
+    });
+    onChange?.(null);
+  }, [onChange]);
 
   // Handle key press and navigation
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
       if (isDisabled) return;
       if (e.target instanceof HTMLInputElement) {
-        // Open dropdown with Alt + Down
         if (e.altKey && e.key === "ArrowDown") {
-          setIsOpen(true);
+          setState((prev) => ({ ...prev, isOpen: true }));
         }
       }
-      if (!isOpen) return;
       switch (e.key) {
         case "ArrowDown":
-          setHighlightedIndex((prev) =>
-            prev === null || prev === options.length - 1 ? 0 : prev + 1
-          );
+          setState((prev) => ({
+            ...prev,
+            highlightedIndex:
+              prev.highlightedIndex === null ||
+              prev.highlightedIndex === options.length - 1
+                ? 0
+                : prev.highlightedIndex + 1,
+          }));
           break;
         case "ArrowUp":
-          setHighlightedIndex((prev) =>
-            prev === null || prev === 0 ? options.length - 1 : prev - 1
-          );
+          setState((prev) => ({
+            ...prev,
+            highlightedIndex:
+              prev.highlightedIndex === null || prev.highlightedIndex === 0
+                ? options.length - 1
+                : prev.highlightedIndex - 1,
+          }));
           break;
         case "Enter":
-          if (highlightedIndex !== null)
-            handleOptionSelect(options[highlightedIndex]);
+          e.preventDefault();
+          e.stopPropagation();
+          if (highlightedIndex !== null) {
+            handleOptionSelect(options[highlightedIndex], highlightedIndex);
+          }
           break;
         case "Escape":
-          setIsOpen(false);
+          setState((prev) => ({ ...prev, isOpen: false }));
           break;
         case "Tab":
           if (highlightedIndex !== null)
-            handleOptionSelect(options[highlightedIndex]);
-          setIsOpen(false);
-          break;
-        default:
+            handleOptionSelect(options[highlightedIndex], highlightedIndex);
           break;
       }
     },
-    [highlightedIndex, isOpen]
+    [highlightedIndex, options, handleOptionSelect, isDisabled]
   );
-
-  // Select the highlighted option
-  const handleOptionSelect = useCallback(
-    (option: T) => {
-      setSelectedIndex(value ? findVal : options.indexOf(option));
-      setIsOpen(false);
-      setInputValue("");
-      if (onChange) onChange(option);
-    },
-    [options, onChange, value]
-  );
-
-  const handleClear = useCallback(() => {
-    setSelectedIndex(value ? findVal : null);
-    setIsOpen(false);
-    setInputValue("");
-    if (onChange) {
-      const obj: any = {} as T;
-
-      for (const key in obj) {
-        obj[key as any] = undefined;
-      }
-      onChange(obj);
-    }
-  }, [value]);
 
   const renderOption = useCallback(
     (item: T) => {
@@ -186,28 +174,22 @@ const SimpleSelect = <T extends OptionType>({
     [components]
   );
 
-  const filterOptions = useCallback(
-    (data: T[]) => {
-      const valToSearch = inputValue.toLowerCase();
-      return data.filter(
-        (data) => data?.label.toString().toLowerCase().indexOf(valToSearch) > -1
-      );
-    },
-    [inputValue]
-  );
-
-  const filteredOptions = filterOptions(options);
+  const filteredOptions = useMemo(() => {
+    const lowerInput = inputValue.toLowerCase();
+    return options.filter((opt) =>
+      opt.label.toLowerCase().includes(lowerInput)
+    );
+  }, [inputValue, options]);
 
   return (
     <div
       className={`simple-select${className ? ` ${className}` : ""}${
         isDisabled ? " simple-select_isDisabled" : ""
       }`}
-      onClick={toggleDropdown}
       onKeyDown={handleKeyDown}
       ref={dropdownRef}
     >
-      <div className="simple-select-control">
+      <div className="simple-select-control" onClick={toggleDropdown}>
         {!inputValue && selectedIndex !== null && (
           <div className="simple-select-value">
             {renderOption(options[selectedIndex])}
@@ -231,15 +213,16 @@ const SimpleSelect = <T extends OptionType>({
             disabled={isDisabled}
             onFocus={() => {
               if (openMenuOnFocus && !isDisabled) {
-                setIsOpen(true);
+                setState((prev) => ({ ...prev, isOpen: true }));
               }
             }}
-            onChange={(e) => {
-              setInputValue(e.target.value);
-              if (!isOpen && !isDisabled) {
-                setIsOpen(true);
-              }
-            }}
+            onChange={(e) =>
+              setState((prev) => ({
+                ...prev,
+                inputValue: e.target.value,
+                isOpen: !isOpen && !isDisabled,
+              }))
+            }
             {...{
               name: name || undefined,
               id: inputId || undefined,
@@ -315,7 +298,9 @@ const SimpleSelect = <T extends OptionType>({
               options={filteredOptions}
               selectedIndex={selectedIndex}
               highlightedIndex={highlightedIndex}
-              setHighlightedIndex={setHighlightedIndex}
+              setHighlightedIndex={(index) =>
+                setState((prev) => ({ ...prev, highlightedIndex: index }))
+              }
               handleOptionSelect={handleOptionSelect}
             />
           ) : (
@@ -324,7 +309,9 @@ const SimpleSelect = <T extends OptionType>({
               options={filteredOptions}
               selectedIndex={selectedIndex}
               highlightedIndex={highlightedIndex}
-              setHighlightedIndex={setHighlightedIndex}
+              setHighlightedIndex={(index) =>
+                setState((prev) => ({ ...prev, highlightedIndex: index }))
+              }
               handleOptionSelect={handleOptionSelect}
             />
           )}

@@ -1,5 +1,6 @@
 :root {
   --simpleSelect-border-radius: 4px;
+  --simpleSelect-border-radius-dropdown: 4px;
   --simpleSelect-background: rgba(255, 255, 255, 1);
   --simpleSelect-border: rgba(204, 204, 204, 1);
   --simpleSelect-border-focus: rgba(38, 132, 255, 1);
@@ -150,7 +151,7 @@
   -webkit-overflow-scrolling: touch;
   background-color: var(--simpleSelect-dropdown-bg, rgb(255, 255, 255));
   border: 1px solid var(--simpleSelect-border, rgb(204, 204, 204));
-  border-radius: var(--simpleSelect-border-radius, 4px);
+  border-radius: var(--simpleSelect-border-radius-dropdown, 4px);
 }
 
 .simple-select-option {
@@ -181,4 +182,8 @@
   text-align: center;
   color: var(--simpleSelect-no-option, rgb(153, 153, 153));
   padding: 8px 12px;
-} /*# sourceMappingURL=style.css.map */
+}
+
+.simple-select-no-option > p {
+  margin: 0;
+}

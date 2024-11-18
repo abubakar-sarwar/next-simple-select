@@ -1,10 +1,4 @@
-import {
-  Dispatch,
-  SetStateAction,
-  useCallback,
-  useEffect,
-  useRef,
-} from "react";
+import { ReactNode, useCallback, useEffect, useRef } from "react";
 import { FixedSizeList as List } from "react-window";
 
 const ITEM_HEIGHT = 40;
@@ -17,21 +11,12 @@ const VirtualList = <T,>({
   setHighlightedIndex,
   handleOptionSelect,
 }: {
-  renderOption: (
-    item: T
-  ) =>
-    | string
-    | number
-    | boolean
-    | JSX.Element
-    | Iterable<React.ReactNode>
-    | null
-    | undefined;
+  renderOption: (item: T) => ReactNode;
   options: T[];
   selectedIndex: number | null;
   highlightedIndex: number | null;
-  setHighlightedIndex: Dispatch<SetStateAction<number | null>>;
-  handleOptionSelect: (option: any) => void;
+  setHighlightedIndex: (index: number | null) => void;
+  handleOptionSelect: (option: any, index: number) => void;
 }) => {
   const renderOptionList = useCallback(
     ({ index, style }: { index: number; style: React.CSSProperties }) => {
@@ -50,7 +35,7 @@ const VirtualList = <T,>({
             highlightedIndex === index ? " simple-select-option__isfocused" : ""
           }${selectedIndex === index ? " simple-select-option__isActive" : ""}`}
           onMouseEnter={() => setHighlightedIndex(index)}
-          onClick={() => handleOptionSelect(options[index])}
+          onClick={() => handleOptionSelect(options[index], index)}
         >
           {renderOption(options[index])}
         </div>
