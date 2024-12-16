@@ -163,22 +163,22 @@ You can customize the styles of the component using CSS classes as well as CSS v
 
 ```css
 :root {
-  --simpleSelect-background: rgba(255, 255, 255, 1);
-  --simpleSelect-border: rgba(204, 204, 204, 1);
+  --simpleSelect-background: rgb(255, 255, 255);
+  --simpleSelect-border: rgb(229, 231, 235);
   --simpleSelect-border-radius: 4px;
   --simpleSelect-border-radius-dropdown: 4px;
-  --simpleSelect-border-focus: rgba(38, 132, 255, 1);
-  --simpleSelect-input-color: rgba(0, 0, 0, 1);
-  --simpleSelect-placeholder-color: rgba(128, 128, 128, 1);
-  --simpleSelect-separator-color: rgba(204, 204, 204, 1);
-  --simpleSelect-indicator-color: rgba(204, 204, 204, 1);
-  --simpleSelect-indicator-color-active: rgba(102, 102, 102, 1);
-  --simpleSelect-dropdown-bg: rgba(255, 255, 255, 1);
-  --simpleSelect-option-focus-bg: rgb(222, 235, 255, 1);
-  --simpleSelect-option-focus: rgba(0, 0, 0, 1);
-  --simpleSelect-option-active-bg: rgba(49, 129, 250, 1);
-  --simpleSelect-option-active: rgba(255, 255, 255, 1);
-  --simpleSelect-no-option: rgba(153, 153, 153, 1);
+  --simpleSelect-border-focus: rgb(38, 132, 255);
+  --simpleSelect-input-color: rgb(0, 0, 0);
+  --simpleSelect-placeholder-color: rgb(128, 128, 128);
+  --simpleSelect-separator-color: rgb(204, 204, 204);
+  --simpleSelect-indicator-color: rgb(204, 204, 204);
+  --simpleSelect-indicator-color-active: rgb(102, 102, 102);
+  --simpleSelect-dropdown-bg: rgb(255, 255, 255);
+  --simpleSelect-option-focus-bg: rgb(222, 235, 255);
+  --simpleSelect-option-focus: rgb(0, 0, 0);
+  --simpleSelect-option-active-bg: rgb(49, 129, 250);
+  --simpleSelect-option-active: rgb(255, 255, 255);
+  --simpleSelect-no-option: rgb(153, 153, 153);
   --simpleSelect-size-indicators: 20px;
 }
 ```

@@ -10,7 +10,7 @@ const NormalList = <T,>({
 }: {
   renderOption: (item: T) => React.ReactNode;
   options: T[];
-  selectedIndex: number | null;
+  selectedIndex: number;
   highlightedIndex: number | null;
   setHighlightedIndex: (index: number | null) => void;
   handleOptionSelect: (option: T, index: number) => void;
@@ -39,7 +39,11 @@ const NormalList = <T,>({
               className={`simple-select-option${
                 isFocused ? " simple-select-option__isfocused" : ""
               }${isSelected ? " simple-select-option__isActive" : ""}`}
-              onMouseEnter={() => setHighlightedIndex(index)}
+              onMouseEnter={() => {
+                if (highlightedIndex !== index) {
+                  setHighlightedIndex(index);
+                }
+              }}
               onClick={() => handleOptionSelect(item, index)}
               role="option"
               aria-selected={isSelected}

@@ -13,17 +13,17 @@ const VirtualList = <T,>({
 }: {
   renderOption: (item: T) => ReactNode;
   options: T[];
-  selectedIndex: number | null;
+  selectedIndex: number;
   highlightedIndex: number | null;
   setHighlightedIndex: (index: number | null) => void;
-  handleOptionSelect: (option: any, index: number) => void;
+  handleOptionSelect: (option: any) => void;
 }) => {
   const renderOptionList = useCallback(
     ({ index, style }: { index: number; style: React.CSSProperties }) => {
       if (options.length === 0) {
         return (
-          <div style={{ ...style, top: "4px" }}>
-            <p className="simple-select-no-option">No Options</p>
+          <div style={{ ...style }}>
+            <p className="simple-select-no-option">No options</p>
           </div>
         );
       }
@@ -34,8 +34,12 @@ const VirtualList = <T,>({
           className={`simple-select-option${
             highlightedIndex === index ? " simple-select-option__isfocused" : ""
           }${selectedIndex === index ? " simple-select-option__isActive" : ""}`}
-          onMouseEnter={() => setHighlightedIndex(index)}
-          onClick={() => handleOptionSelect(options[index], index)}
+          onMouseEnter={() => {
+            if(highlightedIndex !== index) {
+              setHighlightedIndex(index)
+            }
+          }}
+          onClick={() => handleOptionSelect(options[index])}
         >
           {renderOption(options[index])}
         </div>
@@ -45,7 +49,7 @@ const VirtualList = <T,>({
   );
 
   const calculatedHeight =
-    Math.min(options.length === 0 ? 1 : options.length, 7) * ITEM_HEIGHT;
+    Math.min(options.length === 0 ? 1 : options.length, 7) * ITEM_HEIGHT + 2;
 
   const listRef = useRef<List>(null); // Ref for the list
   useEffect(() => {
@@ -58,7 +62,7 @@ const VirtualList = <T,>({
     <List
       className="simple-select-dropdown simple-select-virtual"
       ref={listRef}
-      height={options.length === 0 ? 52 : calculatedHeight}
+      height={options.length === 0 ? 42 : calculatedHeight}
       itemSize={ITEM_HEIGHT}
       itemCount={options.length === 0 ? 1 : options.length} // Set item count to 1 when there are no options
       width="100%"

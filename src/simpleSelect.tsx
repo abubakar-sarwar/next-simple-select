@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import "./style.css";
 import VirtualList from "./virtualList";
 import NormalList from "./normalList";
+import "./style.css";
 
 type OptionType = {
   label: string;
@@ -48,13 +48,12 @@ const SimpleSelect = <T extends OptionType>({
   const [state, setState] = useState<{
     isOpen: boolean;
     inputValue: string;
-    selectedIndex: null | number;
+    selectedIndex: number;
     highlightedIndex: number | null;
   }>({
     isOpen: false,
     inputValue: "",
-    selectedIndex:
-      options.findIndex((item) => item.label === value?.label) ?? null,
+    selectedIndex: options.findIndex((item) => item.label === value?.label),
     highlightedIndex: null,
   });
 
@@ -75,8 +74,8 @@ const SimpleSelect = <T extends OptionType>({
   // Toggle the dropdown visibility
   const toggleDropdown = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
-      if (!clearableRef.current?.contains(e.target as Node) || !isDisabled) {
-        setState((prev) => ({ ...prev, isOpen: !prev.isOpen }));
+      if (!clearableRef.current?.contains(e.target as Node) && !isDisabled) {
+        setState((prev) => ({ ...prev, inputValue: "", isOpen: !prev.isOpen }));
       }
     },
     [isDisabled]
@@ -87,7 +86,7 @@ const SimpleSelect = <T extends OptionType>({
     if (isOpen) {
       const closeDropdown = (e: MouseEvent) => {
         if (!dropdownRef.current?.contains(e.target as Node)) {
-          setState((prev) => ({ ...prev, isOpen: false }));
+          setState((prev) => ({ ...prev, inputValue: "", isOpen: false }));
         }
       };
       document.addEventListener("mousedown", closeDropdown);
@@ -103,21 +102,36 @@ const SimpleSelect = <T extends OptionType>({
         isOpen: false,
         inputValue: "",
         selectedIndex: index,
+        highlightedIndex: index,
       }));
       onChange?.(option);
     },
-    [onChange, options]
+    [onChange]
   );
 
   const handleClear = useCallback(() => {
     setState({
       isOpen: false,
       inputValue: "",
-      selectedIndex: null,
+      selectedIndex: -1,
       highlightedIndex: null,
     });
     onChange?.(null);
   }, [onChange]);
+
+  const renderOption = useCallback(
+    (item: T) => {
+      return components?.Option ? components.Option(item) : item?.label;
+    },
+    [components]
+  );
+
+  const filteredOptions = useMemo(() => {
+    const lowerInput = inputValue.toLowerCase();
+    return options.filter((opt) =>
+      opt.label.toLowerCase().includes(lowerInput)
+    );
+  }, [inputValue, options]);
 
   // Handle key press and navigation
   const handleKeyDown = useCallback(
@@ -134,7 +148,7 @@ const SimpleSelect = <T extends OptionType>({
             ...prev,
             highlightedIndex:
               prev.highlightedIndex === null ||
-              prev.highlightedIndex === options.length - 1
+              prev.highlightedIndex === filteredOptions.length - 1
                 ? 0
                 : prev.highlightedIndex + 1,
           }));
@@ -144,7 +158,7 @@ const SimpleSelect = <T extends OptionType>({
             ...prev,
             highlightedIndex:
               prev.highlightedIndex === null || prev.highlightedIndex === 0
-                ? options.length - 1
+                ? filteredOptions.length - 1
                 : prev.highlightedIndex - 1,
           }));
           break;
@@ -152,34 +166,32 @@ const SimpleSelect = <T extends OptionType>({
           e.preventDefault();
           e.stopPropagation();
           if (highlightedIndex !== null) {
-            handleOptionSelect(options[highlightedIndex], highlightedIndex);
+            const selOption = options.findIndex(
+              (item) => item.label === filteredOptions[highlightedIndex]?.label
+            );
+            if (selOption >= 0) {
+              handleOptionSelect(options[selOption], selOption);
+            }
           }
           break;
         case "Escape":
           setState((prev) => ({ ...prev, isOpen: false }));
           break;
         case "Tab":
-          if (highlightedIndex !== null)
-            handleOptionSelect(options[highlightedIndex], highlightedIndex);
+          if (highlightedIndex !== null) {
+            const selOption = options.findIndex(
+              (item) => item.label === filteredOptions[highlightedIndex]?.label
+            );
+            if (selOption >= 0) {
+              handleOptionSelect(options[selOption], selOption);
+            }
+          } else
+            setState((prev) => ({ ...prev, inputValue: "", isOpen: false }));
           break;
       }
     },
-    [highlightedIndex, options, handleOptionSelect, isDisabled]
+    [highlightedIndex, filteredOptions, options, handleOptionSelect, isDisabled]
   );
-
-  const renderOption = useCallback(
-    (item: T) => {
-      return components?.Option ? components.Option(item) : item?.label;
-    },
-    [components]
-  );
-
-  const filteredOptions = useMemo(() => {
-    const lowerInput = inputValue.toLowerCase();
-    return options.filter((opt) =>
-      opt.label.toLowerCase().includes(lowerInput)
-    );
-  }, [inputValue, options]);
 
   return (
     <div
@@ -190,9 +202,9 @@ const SimpleSelect = <T extends OptionType>({
       ref={dropdownRef}
     >
       <div className="simple-select-control" onClick={toggleDropdown}>
-        {!inputValue && selectedIndex !== null && (
+        {!inputValue && selectedIndex !== -1 && (
           <div className="simple-select-value">
-            {renderOption(options[selectedIndex])}
+            {renderOption(filteredOptions[selectedIndex])}
           </div>
         )}
         <div className="simple-select-input-control">
@@ -220,6 +232,7 @@ const SimpleSelect = <T extends OptionType>({
               setState((prev) => ({
                 ...prev,
                 inputValue: e.target.value,
+                highlightedIndex: null,
                 isOpen: !prev.isOpen && !isDisabled ? true : prev.isOpen,
               }));
             }}
@@ -227,13 +240,13 @@ const SimpleSelect = <T extends OptionType>({
               name: name || undefined,
               id: inputId || undefined,
             }}
-            {...(selectedIndex === null && {
-              placeholder: placeholder ? placeholder : "Select...",
+            {...(selectedIndex === -1 && {
+              placeholder: placeholder ?? "Select",
             })}
           />
         </div>
       </div>
-      {isClearable && selectedIndex !== null && (
+      {isClearable && selectedIndex !== -1 && (
         <div
           onClick={handleClear}
           ref={clearableRef}
@@ -302,7 +315,14 @@ const SimpleSelect = <T extends OptionType>({
               setHighlightedIndex={(index) =>
                 setState((prev) => ({ ...prev, highlightedIndex: index }))
               }
-              handleOptionSelect={handleOptionSelect}
+              handleOptionSelect={(opt) => {
+                const selOption = options.findIndex(
+                  (item) => item.label === opt?.label
+                );
+                if (selOption >= 0) {
+                  handleOptionSelect(options[selOption], selOption);
+                }
+              }}
             />
           ) : (
             <NormalList
@@ -313,7 +333,14 @@ const SimpleSelect = <T extends OptionType>({
               setHighlightedIndex={(index) =>
                 setState((prev) => ({ ...prev, highlightedIndex: index }))
               }
-              handleOptionSelect={handleOptionSelect}
+              handleOptionSelect={(opt) => {
+                const selOption = options.findIndex(
+                  (item) => item.label === opt?.label
+                );
+                if (selOption >= 0) {
+                  handleOptionSelect(options[selOption], selOption);
+                }
+              }}
             />
           )}
         </div>
