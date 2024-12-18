@@ -2,6 +2,44 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import VirtualList from "./virtualList";
 import NormalList from "./normalList";
 import "./style.css";
+import { FixedSizeList } from "react-window";
+
+const isDocumentElement = (
+  el: HTMLElement | typeof window
+): el is typeof window => {
+  return [document.documentElement, document.body, window].indexOf(el) > -1;
+};
+
+const scrollTo = (el: HTMLElement, top: number): void => {
+  // with a scroll distance, we perform scroll on the element
+  if (isDocumentElement(el)) {
+    window.scrollTo(0, top);
+    return;
+  }
+
+  el.scrollTop = top;
+};
+
+const scrollIntoView = (menuEl: HTMLElement, focusedEl: HTMLElement): void => {
+  const menuRect = menuEl.getBoundingClientRect();
+  const focusedRect = focusedEl.getBoundingClientRect();
+  const overScroll = focusedEl.offsetHeight / 3;
+
+  if (focusedRect.bottom + overScroll > menuRect.bottom) {
+    scrollTo(
+      menuEl,
+      Math.min(
+        focusedEl.offsetTop +
+          focusedEl.clientHeight -
+          menuEl.offsetHeight +
+          overScroll,
+        menuEl.scrollHeight
+      )
+    );
+  } else if (focusedRect.top - overScroll < menuRect.top) {
+    scrollTo(menuEl, Math.max(focusedEl.offsetTop - overScroll, 0));
+  }
+};
 
 type OptionType = {
   label: string;
@@ -45,6 +83,7 @@ const SimpleSelect = <T extends OptionType>({
   showSeparator = false,
   useVirtualList = false,
 }: SimpleSelectProps<T>) => {
+  const selIndex = options.findIndex((item) => item.label === value?.label);
   const [state, setState] = useState<{
     isOpen: boolean;
     inputValue: string;
@@ -53,13 +92,27 @@ const SimpleSelect = <T extends OptionType>({
   }>({
     isOpen: false,
     inputValue: "",
-    selectedIndex: options.findIndex((item) => item.label === value?.label),
+    selectedIndex: selIndex,
     highlightedIndex: null,
   });
 
   const { isOpen, inputValue, selectedIndex, highlightedIndex } = state;
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const clearableRef = useRef<HTMLDivElement | null>(null);
+  const menuRef = useRef<HTMLUListElement | FixedSizeList | null>(null);
+
+  useEffect(() => {
+    if (value) {
+      setState((prev) => {
+        return {
+          ...prev,
+          isOpen: false,
+          selectedIndex: selIndex,
+          highlightedIndex: selIndex,
+        };
+      });
+    }
+  }, [value]);
 
   useEffect(() => {
     if (options.length > 500 && !useVirtualList) {
@@ -133,6 +186,19 @@ const SimpleSelect = <T extends OptionType>({
     );
   }, [inputValue, options]);
 
+  const scrollToItem = (index: number) => {
+    const menu = menuRef.current;
+    if (!menu) return;
+    if (useVirtualList) {
+      (menu as FixedSizeList).scrollToItem(index, "auto");
+    } else {
+      const highlightedOption = (menu as HTMLUListElement).children[index];
+      if (highlightedOption instanceof HTMLElement) {
+        scrollIntoView(menu as HTMLUListElement, highlightedOption);
+      }
+    }
+  };
+
   // Handle key press and navigation
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -144,23 +210,32 @@ const SimpleSelect = <T extends OptionType>({
       }
       switch (e.key) {
         case "ArrowDown":
-          setState((prev) => ({
-            ...prev,
-            highlightedIndex:
-              prev.highlightedIndex === null ||
-              prev.highlightedIndex === filteredOptions.length - 1
-                ? 0
-                : prev.highlightedIndex + 1,
-          }));
+          const index =
+            highlightedIndex === null ||
+            highlightedIndex === filteredOptions.length - 1
+              ? 0
+              : highlightedIndex + 1;
+          scrollToItem(index);
+          setState((prev) => {
+            return {
+              ...prev,
+              highlightedIndex: index,
+            };
+          });
           break;
         case "ArrowUp":
-          setState((prev) => ({
-            ...prev,
-            highlightedIndex:
-              prev.highlightedIndex === null || prev.highlightedIndex === 0
-                ? filteredOptions.length - 1
-                : prev.highlightedIndex - 1,
-          }));
+          const indexUp =
+            highlightedIndex === null || highlightedIndex === 0
+              ? filteredOptions.length - 1
+              : highlightedIndex - 1;
+
+          scrollToItem(indexUp);
+          setState((prev) => {
+            return {
+              ...prev,
+              highlightedIndex: indexUp,
+            };
+          });
           break;
         case "Enter":
           e.preventDefault();
@@ -308,6 +383,7 @@ const SimpleSelect = <T extends OptionType>({
         <div className="simple-select-dropdown-container">
           {useVirtualList ? (
             <VirtualList
+              menuRef={menuRef}
               renderOption={renderOption}
               options={filteredOptions}
               selectedIndex={selectedIndex}
@@ -326,6 +402,7 @@ const SimpleSelect = <T extends OptionType>({
             />
           ) : (
             <NormalList
+              menuRef={menuRef}
               renderOption={renderOption}
               options={filteredOptions}
               selectedIndex={selectedIndex}
