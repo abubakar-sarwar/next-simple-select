@@ -1,44 +1,44 @@
-import React from "react";
-import { FixedSizeList } from "react-window";
+import React, { memo } from "react";
+import type { ListImperativeAPI } from "react-window";
 
-const isDocumentElement = (
-  el: HTMLElement | typeof window
-): el is typeof window => {
-  return [document.documentElement, document.body, window].indexOf(el) > -1;
+type RowProps<T> = {
+  item: T;
+  index: number;
+  isFocused: boolean;
+  isSelected: boolean;
+  renderOption: (item: T) => React.ReactNode;
+  setHighlightedIndex: (index: number | null) => void;
+  handleOptionSelect: (option: T) => void;
 };
 
-const scrollTo = (el: HTMLElement, top: number): void => {
-  // with a scroll distance, we perform scroll on the element
-  if (isDocumentElement(el)) {
-    window.scrollTo(0, top);
-    return;
-  }
+// Memoized so a highlight change only re-renders the two affected rows
+const Row = memo(function Row<T>({
+  item,
+  index,
+  isFocused,
+  isSelected,
+  renderOption,
+  setHighlightedIndex,
+  handleOptionSelect,
+}: RowProps<T>) {
+  return (
+    <li
+      className={`simple-select-option${
+        isFocused ? " simple-select-option__isfocused" : ""
+      }${isSelected ? " simple-select-option__isActive" : ""}`}
+      onMouseMove={() => {
+        if (!isFocused) setHighlightedIndex(index);
+      }}
+      onClick={() => handleOptionSelect(item)}
+      role="option"
+      aria-selected={isSelected}
+    >
+      {renderOption(item)}
+    </li>
+  );
+}) as <T>(props: RowProps<T>) => React.ReactElement;
 
-  el.scrollTop = top;
-};
-
-const scrollIntoView = (menuEl: HTMLElement, focusedEl: HTMLElement): void => {
-  const menuRect = menuEl.getBoundingClientRect();
-  const focusedRect = focusedEl.getBoundingClientRect();
-  const overScroll = focusedEl.offsetHeight / 3;
-
-  if (focusedRect.bottom + overScroll > menuRect.bottom) {
-    scrollTo(
-      menuEl,
-      Math.min(
-        focusedEl.offsetTop +
-          focusedEl.clientHeight -
-          menuEl.offsetHeight +
-          overScroll,
-        menuEl.scrollHeight
-      )
-    );
-  } else if (focusedRect.top - overScroll < menuRect.top) {
-    scrollTo(menuEl, Math.max(focusedEl.offsetTop - overScroll, 0));
-  }
-};
-
-const NormalList = <T,>({
+const NormalList = <T extends { value: string }>({
   menuRef,
   options,
   highlightedIndex,
@@ -47,13 +47,13 @@ const NormalList = <T,>({
   handleOptionSelect,
   renderOption,
 }: {
-  menuRef: React.Ref<HTMLUListElement | FixedSizeList | null>;
+  menuRef: React.Ref<HTMLUListElement | ListImperativeAPI | null>;
   renderOption: (item: T) => React.ReactNode;
   options: T[];
   selectedIndex: number;
   highlightedIndex: number | null;
   setHighlightedIndex: (index: number | null) => void;
-  handleOptionSelect: (option: T, index: number) => void;
+  handleOptionSelect: (option: T) => void;
 }) => {
   return (
     <ul
@@ -61,29 +61,18 @@ const NormalList = <T,>({
       ref={menuRef as React.Ref<HTMLUListElement>}
     >
       {options.length > 0 ? (
-        options.map((item, index) => {
-          const isFocused = highlightedIndex === index;
-          const isSelected = selectedIndex === index;
-
-          return (
-            <li
-              key={index}
-              className={`simple-select-option${
-                isFocused ? " simple-select-option__isfocused" : ""
-              }${isSelected ? " simple-select-option__isActive" : ""}`}
-              onMouseMove={() => {
-                if (highlightedIndex !== index) {
-                  setHighlightedIndex(index);
-                }
-              }}
-              onClick={() => handleOptionSelect(item, index)}
-              role="option"
-              aria-selected={isSelected}
-            >
-              {renderOption(item)}
-            </li>
-          );
-        })
+        options.map((item, index) => (
+          <Row
+            key={item.value}
+            item={item}
+            index={index}
+            isFocused={highlightedIndex === index}
+            isSelected={selectedIndex === index}
+            renderOption={renderOption}
+            setHighlightedIndex={setHighlightedIndex}
+            handleOptionSelect={handleOptionSelect}
+          />
+        ))
       ) : (
         <li className="simple-select-no-option">
           <p>No options</p>

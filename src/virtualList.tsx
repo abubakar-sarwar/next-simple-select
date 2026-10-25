@@ -1,7 +1,60 @@
-import { forwardRef, ReactNode, useCallback, useEffect, useRef } from "react";
-import { FixedSizeList, FixedSizeList as List } from "react-window";
+import { ReactNode, Ref, useState } from "react";
+import { List, ListImperativeAPI, RowComponentProps } from "react-window";
 
 const ITEM_HEIGHT = 40;
+const PADDING = 4;
+// Must match .simple-select-dropdown max-height in style.scss
+const MAX_HEIGHT = 300;
+
+type RowData<T> = {
+  options: T[];
+  selectedIndex: number;
+  highlightedIndex: number | null;
+  renderOption: (item: T) => ReactNode;
+  setHighlightedIndex: (index: number | null) => void;
+  handleOptionSelect: (option: T) => void;
+};
+
+// Defined at module level so react-window keeps the same component type
+// between renders and never remounts rows
+function Row<T>({
+  index,
+  style,
+  ariaAttributes,
+  options,
+  selectedIndex,
+  highlightedIndex,
+  renderOption,
+  setHighlightedIndex,
+  handleOptionSelect,
+}: RowComponentProps<RowData<T>>) {
+  if (options.length === 0) {
+    return (
+      <div style={style}>
+        <p className="simple-select-no-option">No options</p>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      style={style}
+      aria-posinset={ariaAttributes["aria-posinset"]}
+      aria-setsize={ariaAttributes["aria-setsize"]}
+      role="option"
+      aria-selected={selectedIndex === index}
+      className={`simple-select-option${
+        highlightedIndex === index ? " simple-select-option__isfocused" : ""
+      }${selectedIndex === index ? " simple-select-option__isActive" : ""}`}
+      onMouseMove={() => {
+        if (highlightedIndex !== index) setHighlightedIndex(index);
+      }}
+      onClick={() => handleOptionSelect(options[index])}
+    >
+      {renderOption(options[index])}
+    </div>
+  );
+}
 
 const VirtualList = <T,>({
   menuRef,
@@ -12,76 +65,55 @@ const VirtualList = <T,>({
   setHighlightedIndex,
   handleOptionSelect,
 }: {
-  menuRef: React.Ref<HTMLUListElement | FixedSizeList | null>;
+  menuRef: Ref<ListImperativeAPI | HTMLUListElement | null>;
   renderOption: (item: T) => ReactNode;
   options: T[];
   selectedIndex: number;
   highlightedIndex: number | null;
   setHighlightedIndex: (index: number | null) => void;
-  handleOptionSelect: (option: any) => void;
+  handleOptionSelect: (option: T) => void;
 }) => {
-  const renderOptionList = ({
-    index,
-    style,
-  }: {
-    index: number;
-    style: any;
-  }) => {
-    if (options.length === 0) {
-      return (
-        <div style={{ ...style, top: `${parseFloat(style.top) + 4}px` }}>
-          <p className="simple-select-no-option">No options</p>
-        </div>
-      );
-    }
+  // Show one row for the "No options" message when empty
+  const rowCount = options.length || 1;
+  const height = Math.min(rowCount * ITEM_HEIGHT, MAX_HEIGHT - PADDING * 2);
 
-    return (
-      <div
-        style={{ ...style, top: `${parseFloat(style.top) + 4}px` }}
-        className={`simple-select-option${
-          highlightedIndex === index ? " simple-select-option__isfocused" : ""
-        }${selectedIndex === index ? " simple-select-option__isActive" : ""}`}
-        onMouseMove={() => {
-          if (highlightedIndex !== index) {
-            setHighlightedIndex(index);
-          }
-        }}
-        onClick={() => handleOptionSelect(options[index])}
-      >
-        {renderOption(options[index])}
-      </div>
-    );
-  };
+  // Start with the selected option centered. Computed up front because the
+  // list isn't measured yet on first render, so scrollToRow can't do it
+  const [defaultScrollOffset] = useState(() =>
+    selectedIndex > 0
+      ? Math.max(
+          0,
+          Math.min(
+            selectedIndex * ITEM_HEIGHT - (height - ITEM_HEIGHT) / 2,
+            rowCount * ITEM_HEIGHT - height
+          )
+        )
+      : 0
+  );
 
-  const calculatedHeight =
-    Math.min(options.length === 0 ? 1 : options.length, 7) * ITEM_HEIGHT + 8;
-
-  const innerElementType = forwardRef(({ style, ...rest }: any, ref) => {
-    const adding = options.length === 0 ? 0 : 8;
-    return (
-      <div
-        ref={ref}
-        style={{
-          ...style,
-          height: `${parseFloat(style.height) + 8}px`,
-        }}
-        {...rest}
-      />
-    );
-  });
-
+  // v2 positions rows with transforms, so padding lives on a wrapper
   return (
-    <List
-      ref={menuRef as React.Ref<FixedSizeList<any>>}
+    <div
       className="simple-select-dropdown simple-select-virtual"
-      height={options.length === 0 ? 48 : calculatedHeight}
-      itemSize={ITEM_HEIGHT}
-      itemCount={options.length === 0 ? 1 : options.length} // Set item count to 1 when there are no options
-      width="100%"
-      innerElementType={innerElementType}
+      style={{ padding: `${PADDING}px 0` }}
     >
-      {renderOptionList}
-    </List>
+      <List
+        listRef={menuRef as Ref<ListImperativeAPI>}
+        rowComponent={Row}
+        rowCount={rowCount}
+        rowHeight={ITEM_HEIGHT}
+        rowProps={{
+          options,
+          selectedIndex,
+          highlightedIndex,
+          renderOption,
+          setHighlightedIndex,
+          handleOptionSelect,
+        }}
+        defaultScrollOffset={defaultScrollOffset}
+        style={{ height }}
+      />
+    </div>
   );
 };
 

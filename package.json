@@ -1,11 +1,28 @@
 {
   "name": "next-simple-select",
-  "version": "0.0.9",
+  "version": "0.1.0",
   "description": "next-simple-select optimized for large datasets",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
-  "style": "./dist/index.css",
   "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": [
+    "*.css"
+  ],
   "scripts": {
     "build": "tsup",
     "watch": "tsup --watch"
@@ -29,13 +46,19 @@
   },
   "devDependencies": {
     "@types/node": "^22.7.5",
-    "@types/react": "^18.3.11",
-    "@types/react-window": "^1.8.8",
-    "tsup": "^8.3.0",
+    "@types/react": "^19",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "tsup": "^9.0.0",
     "typescript": "^5.6.2"
   },
+  "peerDependencies": {
+    "react": ">=18"
+  },
   "dependencies": {
-    "react": "^18.3.1",
-    "react-window": "^1.8.10"
+    "react-window": "^2.5.0"
+  },
+  "allowScripts": {
+    "esbuild@0.28.2": true
   }
 }

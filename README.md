@@ -31,7 +31,9 @@ One of the standout features of this package is the implementation of `useVirtua
 - **Reduced Memory Footprint**: Minimizes the number of DOM nodes created, conserving memory resources for large datasets.
 - **Seamless User Experience**: Provides a responsive interface even with substantial amounts of data, making scrolling and interaction fluid.
 
-> **Note**: This feature is disabled by default. To enable virtual scrolling, set the `useVirtualList` prop to `true` in your component.
+> **Note**: Virtual scrolling turns on automatically when there are more than 100 options. Change the cutoff with `virtualThreshold`, or force it with `useVirtualList={true}` / `useVirtualList={false}`.
+>
+> Virtual rows have a fixed height of 40px. If a custom `Option` is taller, set `useVirtualList={false}`.
 
 # Installation and usage
 
@@ -80,16 +82,20 @@ Common props you may want to specify include:
 - `onChange` - subscribe to change events.
 - `options` - specify the options the user can select from.
 - `placeholder` - change the text displayed when no option is selected.
-- `value` - control the current value.
+- `value` - control the current value. Pass `null` to clear it.
+- `defaultValue` - initial value when `value` is not controlled.
 - `isClearable` - allow the user to clear the selected value.
 - `showSeparator` - display a separator between options.
 - `openMenuOnFocus` - automatically open the dropdown menu when the input is focused.
-- `useVirtualList` - enable virtual scrolling for performance with large lists.
+- `useVirtualList` - force virtual scrolling on or off. When omitted, it's decided by `virtualThreshold`.
+- `virtualThreshold` - use virtual scrolling automatically above this many options (default `100`).
 - `components` - customize components within the select, including:
   - `IndicatorDropdown` - custom indicator for the dropdown.
   - `IndicatorSeparator` - custom separator indicator.
   - `IndicatorClearable` - custom clear indicator.
   - `Option` - render a custom option component.
+
+Each option needs a unique `value`; it's used to match the selected option.
 
 ## Customizations
 
@@ -157,6 +163,8 @@ export default function App() {
 }
 ```
 
+> **Performance tip**: define `options` and `components` outside your component (or wrap them in `useMemo`). Inline objects are new on every render, which makes the select re-render too.
+
 ![Sample Component Injection Image](https://github.com/abubakar-sarwar/next-simple-select/blob/main/simpleSelectCustom.png)
 
 You can customize the styles of the component using CSS classes as well as CSS variables. Below are the available CSS variables you can set in your styles:
@@ -164,6 +172,8 @@ You can customize the styles of the component using CSS classes as well as CSS v
 ```css
 :root {
   --simpleSelect-background: rgb(255, 255, 255);
+  --simpleSelect-background-disabled: rgb(242, 242, 242);
+  --simpleSelect-color-disabled: rgb(153, 153, 153);
   --simpleSelect-border: rgb(229, 231, 235);
   --simpleSelect-border-radius: 4px;
   --simpleSelect-border-radius-dropdown: 4px;
@@ -190,9 +200,11 @@ This package is fully written in TypeScript, providing strong type safety and de
 The build process uses `tsup` to generate both CommonJS and ES modules, while also generating type declarations (`.d.ts`). Here's a look at the dependencies:
 
 ```json
+"peerDependencies": {
+  "react": ">=18"
+},
 "dependencies": {
-  "react": "^18.3.1",
-  "react-window": "^1.8.10"
+  "react-window": "^2.5.0"
 }
 ```
 
